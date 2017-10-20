@@ -35,6 +35,8 @@ OPTION_B=2
 OPTION_C= 3
 OPTION_D =4
 OPTION_E = 5
+OPTION_F=
+OPTION_G =
 `
 
 func TestDotEnvPlain(t *testing.T) {
@@ -54,6 +56,12 @@ func TestDotEnvPlain(t *testing.T) {
 	}
 	if env["OPTION_E"] != "5" {
 		t.Error("OPTION_E")
+	}
+	if env["OPTION_F"] != "" {
+		t.Error("OPTION_F")
+	}
+	if env["OPTION_G"] != "" {
+		t.Error("OPTION_G")
 	}
 }
 
