@@ -3,17 +3,17 @@ package dotenv_test
 import (
 	"testing"
 
-	"github.com/direnv/direnv/dotenv"
+	"github.com/direnv/go-dotenv"
 )
 
 // See the reference implementation:
 //   https://github.com/bkeepers/dotenv/blob/master/lib/dotenv/environment.rb
 // TODO: support shell variable expansions
-// TODO: support comments at the end of a line
 
 const TEST_EXPORTED = `export OPTION_A=2
 export OPTION_B='\n' # foo
 #export OPTION_C=3
+export OPTION_D=
 `
 
 func TestDotEnvExported(t *testing.T) {
@@ -27,6 +27,9 @@ func TestDotEnvExported(t *testing.T) {
 	}
 	if env["OPTION_C"] != "" {
 		t.Error("OPTION_C", env["OPTION_C"])
+	}
+	if v, ok := env["OPTION_D"]; !(v == "" && ok) {
+		t.Error("OPTION_D")
 	}
 }
 
@@ -57,10 +60,10 @@ func TestDotEnvPlain(t *testing.T) {
 	if env["OPTION_E"] != "5" {
 		t.Error("OPTION_E")
 	}
-	if env["OPTION_F"] != "" {
+	if v, ok := env["OPTION_F"]; !(v == "" && ok) {
 		t.Error("OPTION_F")
 	}
-	if env["OPTION_G"] != "" {
+	if v, ok := env["OPTION_G"]; !(v == "" && ok) {
 		t.Error("OPTION_G")
 	}
 }
@@ -113,6 +116,7 @@ OPTION_B: '2'
 OPTION_C: ''
 OPTION_D: '\n'
 #OPTION_E: '333'
+OPTION_F: 
 `
 
 func TestDotEnvYAML(t *testing.T) {
@@ -133,4 +137,17 @@ func TestDotEnvYAML(t *testing.T) {
 	if env["OPTION_E"] != "" {
 		t.Error("OPTION_E")
 	}
+	if v, ok := env["OPTION_F"]; !(v == "" && ok) {
+		t.Error("OPTION_F")
+	}
+}
+
+func TestFailingMustParse(t *testing.T) {
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Error("should panic")
+		}
+	}()
+	dotenv.MustParse("...")
 }
