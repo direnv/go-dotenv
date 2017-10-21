@@ -67,12 +67,14 @@ func MustParse(data string) map[string]string {
 }
 
 func parseValue(value string) string {
-	if value[0:1] == "'" && value[len(value)-1:] == "'" {
-		value = value[1 : len(value)-1]
-	} else if value[0:1] == `"` && value[len(value)-1:] == `"` {
-		value = value[1 : len(value)-1]
-		value = expandNewLines(value)
-		value = unescapeCharacters(value)
+	if len(value) > 1 {
+		if value[0:1] == "'" && value[len(value)-1:] == "'" {
+			value = value[1 : len(value)-1]
+		} else if value[0:1] == `"` && value[len(value)-1:] == `"` {
+			value = value[1 : len(value)-1]
+			value = expandNewLines(value)
+			value = unescapeCharacters(value)
+		}
 	}
 
 	return value
