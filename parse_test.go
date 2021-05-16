@@ -269,3 +269,56 @@ func TestVariableExpansion(t *testing.T) {
 	envShouldContain(t, env, "OPTION_Z", "$OPTION_A/bar")
 	envShouldContain(t, env, "OPTION_A1", "foo/bar/foo/bar/foo")
 }
+
+
+const TEST_VARIABLE_EXPANSION_WITH_DEFAULTS = `
+OPTION_A="${FOO:-}"
+OPTION_B="${FOO:-default}"
+OPTION_C='${FOO:-default}'
+OPTION_D="${FOO:-default}/bar"
+OPTION_E='${FOO:-default}/bar'
+OPTION_F="$FOO:-default"
+OPTION_G="$BAR:-default"
+OPTION_H="${BAR:-}"
+OPTION_I="${BAR:-default}"
+OPTION_J='${BAR:-default}'
+OPTION_K="${BAR:-default}/bar"
+OPTION_L='${BAR:-default}/bar'
+OPTION_M="${OPTION_A:-}"
+OPTION_N="${OPTION_A:-default}"
+OPTION_O='${OPTION_A:-default}'
+OPTION_P="${OPTION_A:-default}/bar"
+OPTION_Q='${OPTION_A:-default}/bar'
+OPTION_R="${:-}"
+OPTION_S="${BAR:-:-}"
+`
+
+func TestVariableExpansionWithDefaults(t *testing.T) {
+	err := os.Setenv("FOO", "foo")
+	if err != nil {
+		t.Fatalf("unable to set environment variable for testing: %s", err)
+	}
+
+	env := dotenv.MustParse(TEST_VARIABLE_EXPANSION_WITH_DEFAULTS)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "OPTION_A", "foo")
+	envShouldContain(t, env, "OPTION_B", "foo")
+	envShouldContain(t, env, "OPTION_C", "${FOO:-default}")
+	envShouldContain(t, env, "OPTION_D", "foo/bar")
+	envShouldContain(t, env, "OPTION_E", "${FOO:-default}/bar")
+	envShouldContain(t, env, "OPTION_F", "foo:-default")
+	envShouldContain(t, env, "OPTION_G", ":-default")
+	envShouldContain(t, env, "OPTION_H", "")
+	envShouldContain(t, env, "OPTION_I", "default")
+	envShouldContain(t, env, "OPTION_J", "${BAR:-default}")
+	envShouldContain(t, env, "OPTION_K", "default/bar")
+	envShouldContain(t, env, "OPTION_L", "${BAR:-default}/bar")
+	envShouldContain(t, env, "OPTION_M", "foo")
+	envShouldContain(t, env, "OPTION_N", "foo")
+	envShouldContain(t, env, "OPTION_O", "${OPTION_A:-default}")
+	envShouldContain(t, env, "OPTION_P", "foo/bar")
+	envShouldContain(t, env, "OPTION_Q", "${OPTION_A:-default}/bar")
+	envShouldContain(t, env, "OPTION_R", "") // this is actually invalid in bash, but what to do here?
+	envShouldContain(t, env, "OPTION_S", ":-")
+}

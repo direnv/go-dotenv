@@ -119,19 +119,40 @@ func expandNewLines(value string) string {
 
 func expandEnv(value string, dotenv map[string]string) string {
 	expander := func(value string) string {
-		expanded, found := lookupDotenv(value, dotenv)
+		envKey, defaultValue, hasDefault := splitKeyAndDefault(value, ":-")
+		expanded, found := lookupDotenv(envKey, dotenv)
 
 		if found {
 			return expanded
 		} else {
-			return os.Getenv(value)
+			return getFromEnvOrDefault(envKey, defaultValue, hasDefault)
 		}
 	}
 
 	return os.Expand(value, expander)
 }
 
+func splitKeyAndDefault(value string, sep string) (string, string, bool) {
+	var i = strings.Index(value, sep)
+
+	if i == -1 {
+		return value, "", false
+	} else {
+		return value[0:i], value[i+len(sep):], true
+	}
+}
+
 func lookupDotenv(value string, dotenv map[string]string) (string, bool) {
 	retval, ok := dotenv[value]
 	return retval, ok
+}
+
+func getFromEnvOrDefault(envKey string, defaultValue string, hasDefault bool) string {
+	var envValue = os.Getenv(envKey)
+
+	if len(envValue) == 0 && hasDefault {
+		return defaultValue
+	} else {
+		return envValue
+	}
 }

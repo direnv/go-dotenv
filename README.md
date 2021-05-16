@@ -12,11 +12,12 @@ This library was developed specifically for [direnv](https://direnv.net).
 * `k=v` format
 * bash `export k=v` format
 * yaml `k: v` format
+* variable expansion, including default values as in `${FOO:-default}`
 * comments
 
 ## Missing
 
-* support for variable expansion, probably needs API breakage
+* probably needs API breakage
 
 ## Alternatives
 
