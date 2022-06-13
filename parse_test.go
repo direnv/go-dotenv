@@ -58,6 +58,7 @@ OPTION_D =4
 OPTION_E = 5
 OPTION_F=
 OPTION_G =
+SMTP_ADDRESS=smtp    # This is a comment
 `
 
 func TestDotEnvPlain(t *testing.T) {
@@ -84,6 +85,9 @@ func TestDotEnvPlain(t *testing.T) {
 	}
 	if v, ok := env["OPTION_G"]; !(v == "" && ok) {
 		t.Error("OPTION_G")
+	}
+	if env["SMTP_ADDRESS"] != "smtp" {
+		t.Error("SMTP_ADDRESS")
 	}
 }
 
@@ -269,7 +273,6 @@ func TestVariableExpansion(t *testing.T) {
 	envShouldContain(t, env, "OPTION_Z", "$OPTION_A/bar")
 	envShouldContain(t, env, "OPTION_A1", "foo/bar/foo/bar/foo")
 }
-
 
 const TEST_VARIABLE_EXPANSION_WITH_DEFAULTS = `
 OPTION_A="${FOO:-}"

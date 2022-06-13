@@ -24,7 +24,7 @@ const LINE = `
   |               #   or
   "(?:\"|[^"])*"  #   double quoted value
   |               #   or
-  [^#\n]+         #   unquoted value
+  [^\s#\n]+       #   unquoted value
 )?                # value end
 \s*
 (?:\#.*)?         # optional comment
