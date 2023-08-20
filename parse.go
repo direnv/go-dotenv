@@ -6,6 +6,7 @@ package dotenv
 
 import (
 	"fmt"
+	"mvdan.cc/sh/v3/shell"
 	"os"
 	"regexp"
 	"strings"
@@ -129,7 +130,11 @@ func expandEnv(value string, dotenv map[string]string) string {
 		}
 	}
 
-	return os.Expand(value, expander)
+	expanded, err := shell.Expand(value, expander)
+	if err != nil {
+		panic(err)
+	}
+	return expanded
 }
 
 func splitKeyAndDefault(value string, sep string) (string, string, bool) {

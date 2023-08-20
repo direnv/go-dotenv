@@ -292,7 +292,6 @@ OPTION_N="${OPTION_A:-default}"
 OPTION_O='${OPTION_A:-default}'
 OPTION_P="${OPTION_A:-default}/bar"
 OPTION_Q='${OPTION_A:-default}/bar'
-OPTION_R="${:-}"
 OPTION_S="${BAR:-:-}"
 `
 
@@ -322,6 +321,24 @@ func TestVariableExpansionWithDefaults(t *testing.T) {
 	envShouldContain(t, env, "OPTION_O", "${OPTION_A:-default}")
 	envShouldContain(t, env, "OPTION_P", "foo/bar")
 	envShouldContain(t, env, "OPTION_Q", "${OPTION_A:-default}/bar")
-	envShouldContain(t, env, "OPTION_R", "") // this is actually invalid in bash, but what to do here?
 	envShouldContain(t, env, "OPTION_S", ":-")
+}
+
+const TEST_NESTED_VARIABLE_EXPANSION = `
+OPTION_A="${FOO:-${BAR}}"
+OPTION_B="${FOO:-${BAR:-default}}"
+`
+
+func TestNestedVariableExpansion(t *testing.T) {
+	err := os.Setenv("FOO", "")
+	err = os.Setenv("BAR", "bar")
+	if err != nil {
+		t.Fatalf("unable to set environment variable for testing: %s", err)
+	}
+
+	env := dotenv.MustParse(TEST_NESTED_VARIABLE_EXPANSION)
+	shouldNotHaveEmptyKey(t, env)
+
+	envShouldContain(t, env, "OPTION_A", "bar")
+	envShouldContain(t, env, "OPTION_B", "bar")
 }
