@@ -1,5 +1,7 @@
 # go-dotenv
 
+STATUS: deprecated. Use github.com/direnv/direnv/pkg/dotenv instead.
+
 Go parsing library for the dotenv format.
 
 There is no formal definition of the dotenv format but it has been introduced
